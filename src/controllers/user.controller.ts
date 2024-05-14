@@ -5,12 +5,12 @@ import {
   Get,
   Param,
   Delete,
+  Put, // Import Put decorator for handling update requests
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from '../services/user.service';
-import * as bcrypt from 'bcrypt';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard'; // Import JwtAuthGuard
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 @Controller('users')
 export class UserController {
@@ -23,7 +23,6 @@ export class UserController {
     const { name, mobile, password } = body;
 
     try {
-      // Validate mobile number uniqueness and constraints
       const existingUser = await this.userService.findOneByMobile(mobile);
       if (existingUser) {
         return {
@@ -32,18 +31,8 @@ export class UserController {
         };
       }
 
-      console.log('password', password);
-      // Hash the password
-      // const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-
-      // const hashedPassword=password;
-      
-
-      // Create the user
       const newUser = await this.userService.createUser(name, mobile, password);
 
-      console.log(newUser);
-      // Customize the success response
       return {
         message: 'User registered successfully',
         id: newUser._id,
@@ -51,7 +40,6 @@ export class UserController {
         status: newUser.status,
       };
     } catch (error) {
-      // Handle other errors
       return {
         statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: 'Internal server error',
@@ -60,7 +48,7 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard) // Protect getAllUsers endpoint with JwtAuthGuard
+  // @UseGuards(JwtAuthGuard)
   async getAllUsers() {
     const users = await this.userService.getAllUsers();
     return users.map((user) => ({
@@ -72,7 +60,7 @@ export class UserController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard) // Protect getUserById endpoint with JwtAuthGuard
+  // @UseGuards(JwtAuthGuard)
   async getUserById(@Param('id') id: string) {
     const user = await this.userService.getUserById(id);
     if (!user) {
@@ -90,7 +78,7 @@ export class UserController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard) // Protect deleteUser endpoint with JwtAuthGuard
+  // @UseGuards(JwtAuthGuard)
   async deleteUser(@Param('id') id: string) {
     const user = await this.userService.deleteUser(id);
     if (!user) {
@@ -103,5 +91,45 @@ export class UserController {
       statusCode: HttpStatus.OK,
       message: 'User deleted successfully',
     };
+  }
+
+  // Method for updating a user
+  @Put(':id')
+  @UseGuards(JwtAuthGuard) // Protect updateUser endpoint with JwtAuthGuard
+  async updateUser(@Param('id') id: string, @Body() body: { name?: string }) {
+    try {
+      const existingUser = await this.userService.getUserById(id);
+      if (!existingUser) {
+        return {
+          statusCode: HttpStatus.NOT_FOUND,
+          message: 'User not found',
+        };
+      }
+
+      if (!body.name) {
+        return {
+          statusCode: HttpStatus.BAD_REQUEST,
+          message: 'Name field is required',
+        };
+      }
+
+      existingUser.name = body.name;
+
+      await existingUser.save();
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'User name updated successfully',
+        id: existingUser._id,
+        name: existingUser.name,
+        mobile: existingUser.mobile,
+        status: existingUser.status,
+      };
+    } catch (error) {
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+      };
+    }
   }
 }
