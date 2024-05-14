@@ -1,5 +1,3 @@
-// src/services/auth.service.ts
-
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { User } from '../entities/user.entity';
@@ -21,16 +19,14 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Check if the password is hashed using bcrypt
+  
     const isBcryptHashed = user.password.startsWith('$2b$');
 
     let isPasswordValid: boolean;
     if (isBcryptHashed) {
-      // If the password is already hashed with bcrypt, compare it directly
       isPasswordValid = await bcrypt.compare(password, user.password);
     } else {
-      // If the password is not hashed with bcrypt, hash it before comparing
-      const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+      const hashedPassword = await bcrypt.hash(password, 10); 
       isPasswordValid = await bcrypt.compare(password, hashedPassword);
     }
 

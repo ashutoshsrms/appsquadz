@@ -16,8 +16,7 @@ export class UserService {
     mobile: string,
     password: string,
   ): Promise<User> {
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
+    const hashedPassword = await bcrypt.hash(password, 10); 
 
     return this.userDatabaseService.createUser(name, mobile, hashedPassword);
   }

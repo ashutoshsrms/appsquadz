@@ -1,5 +1,3 @@
-// src/services/database.service.ts
-
 import { Injectable } from '@nestjs/common';
 import { InjectConnection } from '@nestjs/mongoose';
 import { Connection } from 'mongoose';
