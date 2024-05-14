@@ -5,7 +5,7 @@ import {
   Get,
   Param,
   Delete,
-  Put, // Import Put decorator for handling update requests
+  Put, 
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
@@ -95,7 +95,7 @@ export class UserController {
 
   // Method for updating a user
   @Put(':id')
-  @UseGuards(JwtAuthGuard) // Protect updateUser endpoint with JwtAuthGuard
+  @UseGuards(JwtAuthGuard)
   async updateUser(@Param('id') id: string, @Body() body: { name?: string }) {
     try {
       const existingUser = await this.userService.getUserById(id);

@@ -33,8 +33,8 @@ The server will start running on `http://localhost:3000` by default.
 
   - Get All Users: `http://localhost:3000/users`
   - Get User by id: `http://localhost:3000/users/:id`
-  - Update Book: `http://localhost:3000/users/:id`
-  - Delete Book: `http://localhost:3000/users/:id`
+  - Update User: `http://localhost:3000/users/:id`
+  - Delete user: `http://localhost:3000/users/:id`
 
 - **Authentication:**
   - User Registration: ` http://localhost:3000/users/signup`
